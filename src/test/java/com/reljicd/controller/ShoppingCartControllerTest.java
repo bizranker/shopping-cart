@@ -1,5 +1,6 @@
 package com.reljicd.controller;
 
+import com.reljicd.service.ProductService;
 import com.reljicd.service.ShoppingCartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +15,15 @@ import static org.mockito.Mockito.*;
 
 public class ShoppingCartControllerTest {
 
-    private ShoppingCartService shoppingCartService;
-    private ShoppingCartController controller;
+    ShoppingCartService shoppingCartService;
+    ProductService productService; // 💥 Needed for constructor
+    ShoppingCartController controller;
 
     @BeforeEach
     public void setup() {
         shoppingCartService = Mockito.mock(ShoppingCartService.class);
-        controller = new ShoppingCartController(shoppingCartService);
+        productService = Mockito.mock(ProductService.class); // ✅ Mock ProductService too
+        controller = new ShoppingCartController(shoppingCartService, productService);
     }
 
     @Test
@@ -35,4 +38,3 @@ public class ShoppingCartControllerTest {
         verify(shoppingCartService).getTotal();
     }
 }
-
