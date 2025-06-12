@@ -35,6 +35,7 @@ pipeline {
             steps {
                 dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DP'
             }
+            }
         }
     }
 }
