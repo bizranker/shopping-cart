@@ -2,24 +2,25 @@ pipeline {
     agent { label 'master' }
 
     tools {
-        maven 'Maven'
-        jdk 'JDK17'
+        maven 'maven3'
+        jdk 'jdk17'
     }
 
     environment {
-        PATH = "${tool 'Maven'}/bin:${env.PATH}"
+        PATH = "${tool 'maven3'}/bin:${env.PATH}"
     }
 
     stages {
-        stage('Declarative: Tool Install') {
+        stage('Tool Check') {
             steps {
-                echo "Tools installed."
+                echo "Tools installed and environment configured."
             }
         }
 
         stage('Git Checkout') {
             steps {
-                git credentialsId: 'git-cred-bizranker-shopping-cart', url: 'https://github.com/bizranker/shopping-cart.git'
+                git credentialsId: 'git-cred-bizranker-shopping-cart',
+                    url: 'https://github.com/bizranker/shopping-cart.git'
             }
         }
 
@@ -31,7 +32,7 @@ pipeline {
 
         stage('OWASP Scan') {
             steps {
-                dependencyCheck additionalArguments: '', odcInstallation: 'DP', outdir: '', scanpath: ''
+                dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DP'
             }
         }
     }
