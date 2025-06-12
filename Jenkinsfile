@@ -22,7 +22,7 @@ pipeline {
                 git branch: 'main',
                     credentialsId: 'git-cred-bizranker-shopping-cart',
                     url: 'https://github.com/bizranker/shopping-cart.git'
-
+            }
         }
 
         stage('COMPILE') {
@@ -34,7 +34,6 @@ pipeline {
         stage('OWASP Scan') {
             steps {
                 dependencyCheck additionalArguments: '--scan .', odcInstallation: 'DP'
-            }
             }
         }
     }
