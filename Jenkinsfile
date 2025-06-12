@@ -19,7 +19,7 @@ pipeline {
 
         stage('Git Checkout') {
             steps {
-                git credentialsId: 'e75529fa-7bec-4ad1-80d0-567ea93aeece', url: 'https://github.com/brianbills21/shopping-cart.git'
+                git credentialsId: 'e75529fa-7bec-4ad1-80d0-567ea93aeece', url: 'https://github.com/bizranker/shopping-cart.git'
             }
         }
 
