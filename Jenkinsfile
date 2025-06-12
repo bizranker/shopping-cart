@@ -19,9 +19,10 @@ pipeline {
 
         stage('Git Checkout') {
             steps {
-                git credentialsId: 'git-cred-bizranker-shopping-cart',
+                git branch: 'main',
+                    credentialsId: 'git-cred-bizranker-shopping-cart',
                     url: 'https://github.com/bizranker/shopping-cart.git'
-            }
+
         }
 
         stage('COMPILE') {
