@@ -1,35 +1,46 @@
 pipeline {
-    agent {
-        label 'master'
+    agent any
+
+    environment {
+        MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
     }
 
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
-    }
-
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
+        maven 'Maven 3.8.6'
+        jdk 'Java 17'
     }
 
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', 
-                    changelog: false, 
-                    credentialsId: 'git-cred-bizranker-shopping-cart', 
-                    poll: false, 
-                    url: 'https://github.com/bizranker/shopping-cart.git'
+                checkout scm
             }
         }
 
-        stage('COMPILE') {
+        stage('Compile Code') {
             steps {
-                sh "mvn clean compile -DskipTests=True"
+                sh 'mvn compile'
             }
         }
 
-        stage('Test') {
+        stage('OWASP Dependency Check') {
+            steps {
+                sh 'mvn org.owasp:dependency-check-maven:check'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            environment {
+                SONARQUBE_ENV = credentials('sonarqube-token')
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Run JUnit Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -40,12 +51,46 @@ pipeline {
             }
         }
 
-        stage('OWASP Scan') {
+        stage('Build Docker Image') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ ', odcInstallation: 'DP'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                sh 'docker build -f docker/Dockerfile -t shopping-cart:latest .'
             }
         }
-    } // 👈 end of stages
 
-} // 👈 end of pipeline
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag shopping-cart:latest $DOCKER_USER/shopping-cart:latest
+                        docker push $DOCKER_USER/shopping-cart:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Slack Notification') {
+            steps {
+                slackSend(
+                    channel: '#monita-bizranker',
+                    message: "✅ Shopping-cart build #${env.BUILD_NUMBER} succeeded!",
+                    color: 'good'
+                )
+            }
+        }
+    }
+
+    post {
+        failure {
+            slackSend(
+                channel: '#monita-bizranker',
+                message: "❌ Shopping-cart build #${env.BUILD_NUMBER} failed!",
+                color: 'danger'
+            )
+        }
+    }
+}
