@@ -23,7 +23,7 @@ pipeline {
 
         post {
         success {
-            sh "sudo /var/lib/jenkins/slack_notify.sh success 'All stages completed' ${env.BUILD_NUMBER} shopping-cart ${env.BUILD_URL}"
+            sh """sudo /var/lib/jenkins/slack_notify.sh success 'All stages completed' ${env.BUILD_NUMBER} shopping-cart ${env.BUILD_URL}"""
         }
         failure {
             sh """
