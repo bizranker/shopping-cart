@@ -25,17 +25,19 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            sh """
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{
-                "username": "BuildBot",
-                "icon_emoji": ":classical_building:",
-                "text": "*:trophy: Victory is ours!*\n*Project:* shopping-cart\n*Build:* #${env.BUILD_NUMBER} \n*Time:* $(date)\n:white_check_mark: *Status:* SUCCESS"
-            }' ${SLACK_WEBHOOK}
-            """
-        }
+post {
+    success {
+        sh '''
+        curl -X POST -H "Content-type: application/json" \
+        --data '{
+          "username": "BuildBot",
+          "icon_emoji": ":classical_building:",
+          "text": "*:trophy: Victory is ours!*\n*Project:* shopping-cart\n*Build:* #${BUILD_NUMBER}\n*Time:* $(date)\n:white_check_mark: *Status:* SUCCESS"
+        }' ${SLACK_WEBHOOK}
+        '''
+    }
+}
+
 
         failure {
             sh """
