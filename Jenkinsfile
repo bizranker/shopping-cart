@@ -73,39 +73,34 @@ pipeline {
             }
         }
 
-        stage('Slack Notification') {
-            steps {
-                slackSend(
-                    channel: '#monita-bizranker',
-                    color: 'good',
-                    message: """
-        🏗️ *Build #${env.BUILD_NUMBER} Completed*
-        💼 *Project:* shopping-cart
-        🕰️ *Time:* ${new Date()}
-        🟢 *Status:* SUCCESS
-
-        🔗 <${env.BUILD_URL}|View Build Details>
-                    """
-                )
-            }
-        }
     }
 
         post {
+            success {
+                slackSend(
+                    channel: '#monita-bizranker',
+                    color: 'good',
+                    message: """\
+        :rocket: *Build #${env.BUILD_NUMBER} Completed*
+        *Project:* shopping-cart
+        *Time:* ${new Date()}
+        :large_green_circle: *Status:* SUCCESS
+        <${env.BUILD_URL}|View Build Details>"""
+                )
+            }
             failure {
                 slackSend(
                     channel: '#monita-bizranker',
                     color: 'danger',
-                    message: """
-        🚨 *Build #${env.BUILD_NUMBER} Failed*
-        💼 *Project:* shopping-cart
-        🕰️ *Time:* ${new Date()}
-        🔴 *Status:* FAILURE
-
-        🔍 <${env.BUILD_URL}|Investigate Build Logs>
-                    """
+                    message: """\
+        :x: *Build #${env.BUILD_NUMBER} Failed*
+        *Project:* shopping-cart
+        *Time:* ${new Date()}
+        :warning: *Status:* FAILURE
+        <${env.BUILD_URL}|Investigate Build Logs>"""
                 )
             }
         }
+
 
 }
