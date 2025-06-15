@@ -25,20 +25,20 @@ pipeline {
         }
     }
 
-post {
-  success {
-    script {
-      sh """
-      curl -X POST -H 'Content-type: application/json' \\
-      --data '{
-        "username": "BuildBot",
-        "icon_emoji": ":classical_building:",
-        "text": "*🏛️ Victory is ours!*\n*Project:* shopping-cart\n*Build:* #${env.BUILD_NUMBER}\n*Time:* ${new Date().format("EEE MMM dd hh:mm:ss a z yyyy")}\n:white_check_mark: *Status:* SUCCESS\\n<${env.BUILD_URL}|View Build Details>"
-      }' ${SLACK_WEBHOOK}
-      """
-    }
-  }
-}
+        post {
+            success {
+                script {
+                    def slackWebhookUrl = credentials('slack-webhook')
+                    sh """
+                    curl -X POST -H 'Content-type: application/json' --data '{
+                    "text": ":classical_building: *Build SUCCESS* for shopping-cart! The Jenkins Senate applauds your triumph, Citizen Brian.",
+                    "username": "BuildBot",
+                    "icon_emoji": ":classical_building:"
+                    }' ${slackWebhookUrl}
+                    """
+                }
+            }
+        }
 
 
 
