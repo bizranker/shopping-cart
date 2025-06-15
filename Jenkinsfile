@@ -19,25 +19,25 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            sh '''
-                echo "Sourcing webhook from .env file"
-                source "$DOTENV_PATH"
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":white_check_mark: *BUILD SUCCESS from Jenkins*"}' \
-                "$SLACK_WEBHOOK"
-            '''
+        post {
+            success {
+                sh '''
+                    echo "Loading .env using dot command"
+                    . "$DOTENV_PATH"
+                    curl -X POST -H 'Content-type: application/json' \
+                    --data '{"text": ":white_check_mark: *BUILD SUCCESS from Jenkins*"}' \
+                    "$SLACK_WEBHOOK"
+                '''
+            }
+            failure {
+                sh '''
+                    echo "Loading .env using dot command"
+                    . "$DOTENV_PATH"
+                    curl -X POST -H 'Content-type: application/json' \
+                    --data '{"text": ":x: *BUILD FAILED from Jenkins*"}' \
+                    "$SLACK_WEBHOOK"
+                '''
+            }
         }
 
-        failure {
-            sh '''
-                echo "Sourcing webhook from .env file"
-                source "$DOTENV_PATH"
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":x: *BUILD FAILED from Jenkins*"}' \
-                "$SLACK_WEBHOOK"
-            '''
-        }
-    }
 }
