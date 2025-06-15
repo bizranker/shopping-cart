@@ -77,32 +77,10 @@ pipeline {
 
         post {
             success {
-                slackSend(
-                    channel: '#monita-bizranker',
-                    color: 'good',
-                    message: """\
-        *✅ Build #${env.BUILD_NUMBER} Completed*
-        *📦 Project:* shopping-cart
-        *🕒 Time:* ${new Date()}
-        *🟢 Status:* SUCCESS
-        🔗 <${env.BUILD_URL}|View Build Details>
-        """
-                )
-            }
-            failure {
-                slackSend(
-                    channel: '#monita-bizranker',
-                    color: 'danger',
-                    message: """\
-        *❌ Build #${env.BUILD_NUMBER} Failed*
-        *📦 Project:* shopping-cart
-        *🕒 Time:* ${new Date()}
-        *🔴 Status:* FAILURE
-        🔗 <${env.BUILD_URL}|Investigate Build Logs>
-        """
-                )
+                slackSend(channel: '#monita-bizranker', message: 'Build Success from Jenkins')
             }
         }
+
 
 
 }
