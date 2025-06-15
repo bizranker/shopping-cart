@@ -76,16 +76,17 @@ pipeline {
     }
 
 post {
-    success {
-        withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
-            sh """
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{
-                  "text": ":rocket: *Build #${BUILD_NUMBER}* Completed"
-                }' $SLACK_WEBHOOK
-            """
-        }
+success {
+    withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
+        sh """
+            echo "Webhook: $SLACK_WEBHOOK"
+            curl -v -X POST -H 'Content-type: application/json' \
+            --data '{ "text": ":rocket: *Build #${BUILD_NUMBER}* Completed" }' \
+            $SLACK_WEBHOOK
+        """
     }
+}
+
 
     failure {
         withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
