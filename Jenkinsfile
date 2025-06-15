@@ -29,16 +29,18 @@ pipeline {
             success {
                 script {
                     def slackWebhookUrl = credentials('slack-webhook')
-                    sh """
-                    curl -X POST -H 'Content-type: application/json' --data '{
-                    "text": ":classical_building: *Build SUCCESS* for shopping-cart! The Jenkins Senate applauds your triumph, Citizen Brian.",
-                    "username": "BuildBot",
-                    "icon_emoji": ":classical_building:"
-                    }' ${slackWebhookUrl}
+                    sh label: 'Send Slack Alert', script: """
+                        set -ex
+                        curl -X POST -H 'Content-type: application/json' --data '{
+                        "text": ":classical_building: *Build SUCCESS* for shopping-cart! The Jenkins Senate applauds your triumph, Citizen Brian.",
+                        "username": "BuildBot",
+                        "icon_emoji": ":classical_building:"
+                        }' ${slackWebhookUrl}
                     """
                 }
             }
         }
+
 
 
 
