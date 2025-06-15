@@ -11,15 +11,8 @@ pipeline {
 
     post {
         success {
-            sh '''
-                echo "Sending Slack message"
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":white_check_mark: *BUILD SUCCESS from Jenkins*"}' \
-                'https://hooks.slack.com/services/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'
-            '''
+            sh 'echo "Testing Jenkins post build command"'
+            sh 'curl -X POST -H "Content-type: application/json" --data "{\"text\":\"Test message from Jenkins\"}" $SLACK_WEBHOOK'
         }
     }
-
-
-
 }
