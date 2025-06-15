@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'master' }
 
+    environment {
+        DOTENV_PATH = '/var/lib/jenkins/workspace/shopping-cart/.env'
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -18,15 +22,21 @@ pipeline {
     post {
         success {
             sh '''
-                echo "Notifying Slack of SUCCESS (via .env)"
-                ./scripts/notify_slack.sh SUCCESS "$JOB_NAME" "$BUILD_NUMBER" "$BUILD_URL"
+                echo "Sourcing webhook from .env file"
+                source "$DOTENV_PATH"
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": ":white_check_mark: *BUILD SUCCESS from Jenkins*"}' \
+                "$SLACK_WEBHOOK"
             '''
         }
 
         failure {
             sh '''
-                echo "Notifying Slack of FAILURE (via .env)"
-                ./scripts/notify_slack.sh FAILURE "$JOB_NAME" "$BUILD_NUMBER" "$BUILD_URL"
+                echo "Sourcing webhook from .env file"
+                source "$DOTENV_PATH"
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": ":x: *BUILD FAILED from Jenkins*"}' \
+                "$SLACK_WEBHOOK"
             '''
         }
     }
