@@ -1,41 +1,23 @@
 pipeline {
     agent { label 'master' }
 
-    environment {
-        DOTENV_PATH = '/var/lib/jenkins/workspace/shopping-cart/.env'
-    }
-
     stages {
         stage('Test') {
             steps {
-                echo "Running test stage..."
+                echo 'Running test stage...'
             }
         }
     }
 
     post {
         success {
-            sh '''
-                echo ">>> .env DEBUG: [SUCCESS block]"
-                echo "DOTENV_PATH=$DOTENV_PATH"
-                . "$DOTENV_PATH"
-                echo "SLACK_WEBHOOK=$SLACK_WEBHOOK"
-
-                curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":white_check_mark: *BUILD SUCCESS with .env debug*"}' \
-                "$SLACK_WEBHOOK"
-            '''
+            sh '/var/lib/jenkins/slack_test.sh'
         }
         failure {
             sh '''
-                echo ">>> .env DEBUG: [FAILURE block]"
-                echo "DOTENV_PATH=$DOTENV_PATH"
-                . "$DOTENV_PATH"
-                echo "SLACK_WEBHOOK=$SLACK_WEBHOOK"
-
                 curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":x: *BUILD FAILURE with .env debug*"}' \
-                "$SLACK_WEBHOOK"
+                --data '{"text": ":x: *BUILD FAILED from Jenkins*"}' \
+                'https://hooks.slack.com/services/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'
             '''
         }
     }
