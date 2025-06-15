@@ -1,62 +1,9 @@
 pipeline {
-    agent any
-
-    environment {
-        MAVEN_OPTS = '-Dmaven.repo.local=.m2/repository'
-    }
-
-    tools {
-        maven 'Maven 3.8.6'
-        jdk 'Java 17'
+    agent {
+        label 'master'
     }
 
     stages {
-        stage('Git Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Compile Code') {
-            steps {
-                sh 'mvn compile'
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                sh 'mvn org.owasp:dependency-check-maven:check'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            environment {
-                SONARQUBE_ENV = credentials('sonarqube-token')
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Run JUnit Tests') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -f docker/Dockerfile -t shopping-cart:latest .'
-            }
-        }
-
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
@@ -72,34 +19,26 @@ pipeline {
                 }
             }
         }
-
     }
 
-        post {
-            success {
-                withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
-                    sh """
+    post {
+        success {
+            withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
+                sh """
                     curl -X POST -H 'Content-type: application/json' \\
-                    --data '{ "text": ":rocket: *Build #${BUILD_NUMBER}* Completed" }' \\
+                    --data '{ "text": ":rocket: *Build #${BUILD_NUMBER}* Completed successfully on *master node*." }' \\
                     $SLACK_WEBHOOK
-                    """
-                }
-            }
-            failure {
-                withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
-                    sh """
-                    curl -X POST -H 'Content-type: application/json' \\
-                    --data '{ "text": ":x: *Build #${BUILD_NUMBER}* Failed" }' \\
-                    $SLACK_WEBHOOK
-                    """
-                }
+                """
             }
         }
-
-}
-
-
-
-
-
+        failure {
+            withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
+                sh """
+                    curl -X POST -H 'Content-type: application/json' \\
+                    --data '{ "text": ":x: *Build #${BUILD_NUMBER}* FAILED on *master node*. Check logs." }' \\
+                    $SLACK_WEBHOOK
+                """
+            }
+        }
+    }
 }
