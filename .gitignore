@@ -22,3 +22,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### Slack message test with webhook
+
+scripts/slack_test.sh

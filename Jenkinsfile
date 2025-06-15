@@ -11,14 +11,16 @@ pipeline {
 
     post {
         success {
-            sh '/var/lib/jenkins/slack_test.sh'
-        }
-        failure {
+            echo "Sending Slack notification"
             sh '''
+                echo "Sourcing webhook from .env"
+                source /var/lib/jenkins/workspace/shopping-cart/.env
+                echo "Webhook: $SLACK_WEBHOOK"
                 curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":x: *BUILD FAILED from Jenkins*"}' \
-                'https://hooks.slack.com/services/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'
+                --data '{"text": ":white_check_mark: *BUILD SUCCESS with .env debug*"}' \
+                "$SLACK_WEBHOOK"
             '''
         }
     }
+
 }
