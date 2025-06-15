@@ -77,20 +77,35 @@ pipeline {
             steps {
                 slackSend(
                     channel: '#monita-bizranker',
-                    message: "✅ Shopping-cart build #${env.BUILD_NUMBER} succeeded!",
-                    color: 'good'
+                    color: 'good',
+                    message: """
+        🏗️ *Build #${env.BUILD_NUMBER} Completed*
+        💼 *Project:* shopping-cart
+        🕰️ *Time:* ${new Date()}
+        🟢 *Status:* SUCCESS
+
+        🔗 <${env.BUILD_URL}|View Build Details>
+                    """
                 )
             }
         }
     }
 
-    post {
-        failure {
-            slackSend(
-                channel: '#monita-bizranker',
-                message: "❌ Shopping-cart build #${env.BUILD_NUMBER} failed!",
-                color: 'danger'
-            )
+        post {
+            failure {
+                slackSend(
+                    channel: '#monita-bizranker',
+                    color: 'danger',
+                    message: """
+        🚨 *Build #${env.BUILD_NUMBER} Failed*
+        💼 *Project:* shopping-cart
+        🕰️ *Time:* ${new Date()}
+        🔴 *Status:* FAILURE
+
+        🔍 <${env.BUILD_URL}|Investigate Build Logs>
+                    """
+                )
+            }
         }
-    }
+
 }
