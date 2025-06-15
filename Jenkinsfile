@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'master' }
+    agent any
 
     environment {
         SLACK_WEBHOOK = 'https://hooks.slack.com/services/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'
