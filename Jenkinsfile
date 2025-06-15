@@ -11,14 +11,15 @@ pipeline {
 
     post {
         success {
-            echo "Sending Slack notification"
             sh '''
+                echo "Sending Slack message"
                 curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": ":white_check_mark: *BUILD SUCCESS*"}' \
+                --data '{"text": ":white_check_mark: *BUILD SUCCESS from Jenkins*"}' \
                 'https://hooks.slack.com/services/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'
             '''
         }
     }
+
 
 
 }
