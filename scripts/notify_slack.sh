@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# Load Slack webhook from .env file one level above
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../.env"
+
 STATUS="$1"
 JOB_NAME="$2"
 BUILD_NUMBER="$3"
 BUILD_URL="$4"
-WEBHOOK_URL="$5"
 
 if [ "$STATUS" == "SUCCESS" ]; then
     COLOR="#36a64f"
@@ -18,7 +21,6 @@ fi
 
 MESSAGE="*${TITLE}* ${EMOJI}\\n*Job:* ${JOB_NAME}\\n*Build:* #${BUILD_NUMBER}\\n<${BUILD_URL}|View Build>"
 
-# Build JSON payload properly
 JSON=$(cat <<EOF
 {
   "attachments": [
@@ -33,4 +35,4 @@ EOF
 
 curl -X POST -H "Content-type: application/json" \
      --data "${JSON}" \
-     "${WEBHOOK_URL}"
+     "${SLACK_WEBHOOK}"
