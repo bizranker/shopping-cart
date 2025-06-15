@@ -22,17 +22,17 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            sh '''
-                ./scripts/notify_slack.sh SUCCESS "$JOB_NAME" "$BUILD_NUMBER" "$BUILD_URL" "$SLACK_WEBHOOK"
-            '''
-        }
-
-        failure {
-            sh '''
-                ./scripts/notify_slack.sh FAILURE "$JOB_NAME" "$BUILD_NUMBER" "$BUILD_URL" "$SLACK_WEBHOOK"
-            '''
+post {
+    success {
+        sh '''
+            echo "=== Slack Notification Debug ==="
+            echo "Current Hostname: $(hostname)"
+            echo "Current Directory: $(pwd)"
+            echo "Listing Files:"
+            ls -la scripts
+            echo "Executing Script:"
+            ./scripts/notify_slack.sh SUCCESS "$JOB_NAME" "$BUILD_NUMBER" "$BUILD_URL" "$SLACK_WEBHOOK"
+        '''
         }
     }
 }
