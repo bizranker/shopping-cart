@@ -9,13 +9,28 @@ WEBHOOK_URL="$5"
 if [ "$STATUS" == "SUCCESS" ]; then
     COLOR="#36a64f"
     EMOJI=":white_check_mark:"
-    MESSAGE="*BUILD SUCCESS* $EMOJI\n*Job:* $JOB_NAME\n*Build:* #$BUILD_NUMBER\n<$BUILD_URL|View Build>"
+    TITLE="BUILD SUCCESS"
 else
     COLOR="#FF0000"
     EMOJI=":x:"
-    MESSAGE="*BUILD FAILED* $EMOJI\n*Job:* $JOB_NAME\n*Build:* #$BUILD_NUMBER\n<$BUILD_URL|View Build>"
+    TITLE="BUILD FAILURE"
 fi
 
-payload="payload={\"attachments\":[{\"color\":\"$COLOR\",\"text\":\"$MESSAGE\"}]}"
+MESSAGE="*${TITLE}* ${EMOJI}\\n*Job:* ${JOB_NAME}\\n*Build:* #${BUILD_NUMBER}\\n<${BUILD_URL}|View Build>"
 
-curl -X POST --data-urlencode "$payload" "$WEBHOOK_URL"
+# Build JSON payload properly
+JSON=$(cat <<EOF
+{
+  "attachments": [
+    {
+      "color": "${COLOR}",
+      "text": "${MESSAGE}"
+    }
+  ]
+}
+EOF
+)
+
+curl -X POST -H "Content-type: application/json" \
+     --data "${JSON}" \
+     "${WEBHOOK_URL}"
