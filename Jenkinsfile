@@ -77,22 +77,28 @@ pipeline {
 
 post {
     success {
-        sh """
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{
-                "text": ":rocket: *Build #${BUILD_NUMBER}* Completed\\n*Project:* shopping-cart\\n:clock1: *Time:* ${new Date()}\\n:white_check_mark: *Status:* SUCCESS\\n<${BUILD_URL}|View Build Details>"
-            }' https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-        """
+        withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
+            sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{
+                  "text": ":rocket: *Build #${BUILD_NUMBER}* Completed"
+                }' $SLACK_WEBHOOK
+            """
+        }
     }
+
     failure {
-        sh """
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{
-                "text": ":x: *Build #${BUILD_NUMBER}* Failed\\n*Project:* shopping-cart\\n:clock1: *Time:* ${new Date()}\\n:warning: *Status:* FAILURE\\n<${BUILD_URL}|Investigate Build Logs>"
-            }' https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-        """
+        withCredentials([string(credentialsId: 'slack-webhook-shopping', variable: 'SLACK_WEBHOOK')]) {
+            sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{
+                  "text": ":x: *Build #${BUILD_NUMBER}* Failed"
+                }' $SLACK_WEBHOOK
+            """
+        }
     }
 }
+
 
 
 
