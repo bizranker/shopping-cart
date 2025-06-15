@@ -75,11 +75,25 @@ pipeline {
 
     }
 
-        post {
-            success {
-                slackSend(channel: '#monita-bizranker', message: 'Build Success from Jenkins')
-            }
-        }
+post {
+    success {
+        sh """
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{
+                "text": ":rocket: *Build #${BUILD_NUMBER}* Completed\\n*Project:* shopping-cart\\n:clock1: *Time:* ${new Date()}\\n:white_check_mark: *Status:* SUCCESS\\n<${BUILD_URL}|View Build Details>"
+            }' https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+        """
+    }
+    failure {
+        sh """
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{
+                "text": ":x: *Build #${BUILD_NUMBER}* Failed\\n*Project:* shopping-cart\\n:clock1: *Time:* ${new Date()}\\n:warning: *Status:* FAILURE\\n<${BUILD_URL}|Investigate Build Logs>"
+            }' https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+        """
+    }
+}
+
 
 
 
