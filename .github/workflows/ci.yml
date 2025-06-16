@@ -1,0 +1,26 @@
+name: Build & Notify
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧾 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Build with Maven
+        run: mvn clean package -DskipTests=true
+
+      - name: 🔔 Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":zap: *Build completed!* :white_check_mark:\n\n*Repo:* shopping-cart\n*Branch:* main"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
